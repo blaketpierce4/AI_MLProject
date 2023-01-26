@@ -45,7 +45,8 @@ data<- read.csv("adult.csv")
 ```
 ```{r data_exploration}
 #Studying the structure of the data
- 
+ assign("<=50K ",1)
+assign("=>50K ",1)
 str(data)
 
 ``` 
