@@ -1,0 +1,68 @@
+---
+title: "Inclass1/14"
+output: html_document
+date: "2023-01-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r get_data}
+#Loading required packages
+
+library(tidyverse)
+
+library(ggplot2)
+
+library(caret)
+
+library(caretEnsemble)
+
+library(psych)
+
+library(Amelia)
+
+library(mice)
+
+library(GGally)
+
+library(rpart)
+
+library(randomForest)
+
+
+```
+
+
+```{r get_data}
+#Reading data into R
+data<- read.csv("adult.csv")
+
+
+```
+```{r data_exploration}
+#Studying the structure of the data
+ 
+str(data)
+
+``` 
+
+```{r get_data}
+	
+head(data)
+describe(data)
+#Convert '0' values into NA
+data[, 2:7][data[, 2:7] == 0] <- NA
+#visualize the missing data
+missmap(data)
+```
+```{r get_data}
+#Data Visualization
+#Visual 1
+ggplot(data, aes(Age, colour = capital.gain)) +
+geom_freqpoly(binwidth = 1) + labs(title="Age and capital.gain")
+```
+
