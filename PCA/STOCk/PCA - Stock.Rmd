@@ -1,0 +1,31 @@
+---
+title: "PCA"
+author: "Isac"
+date: "5/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load PCA related packages
+
+```{r cars}
+library(psych)
+library(rela)   # contains Bartlett and KMO tests to verify assumptions
+library(MASS)
+library(parallel)
+
+options(scipen=999)
+```
+
+
+```{r prep_data}
+pca <- read.csv(file = "PCA.csv", header = TRUE, sep = "\t")
+
+colnames(pca) = c("AnnualReturn", "ExcessReturn", "SystematicRisk", "TotalRisk", "AbsWinRate", "RelWinRate")
+head(pca)
+tail(pca)
+
+```

@@ -1,0 +1,28 @@
+---
+title: "PCATRY2"
+output: html_document
+date: "2023-02-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+
+```{r cars}
+library(psych)
+library(rela)   # contains Bartlett and KMO tests to verify assumptions
+library(MASS)
+library(parallel)
+```
+
+
+```{r data_prep}
+pca <- read.csv(file = "PCA.csv", header = TRUE, sep = "\t")
+colnames(pca) = c("AnnualReturn", "ExcessReturn", "SystematicRisk", "TotalRisk", "AbsWinRate", "RelWinRate")
+
+```
+
