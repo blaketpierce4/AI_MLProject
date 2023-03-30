@@ -1,0 +1,30 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the state space and transition probabilities
+states = ["heads", "tails"]
+transitions = np.array([[0.5, 0.5],
+                        [0.5, 0.5]])
+
+# Initialize the chain with a starting state
+current_state = "heads"
+
+# Set up a loop to generate a series of samples from the chain
+num_samples = 1000
+samples = np.zeros(num_samples, dtype=int)
+for i in range(num_samples):
+    # Generate a new state by sampling from the transition probabilities
+    new_state = np.random.choice(states, p=transitions[states.index(current_state)])
+    # Update the current state
+    current_state = new_state
+    # Store the new state in the samples array
+    samples[i] = states.index(current_state)
+
+# Analyze the results
+mean = np.mean(samples)
+variance = np.var(samples)
+plt.hist(samples, bins=len(states))
+plt.title("Histogram of Random Walk Samples")
+plt.xlabel("State")
+plt.ylabel("Frequency")
+plt.show()

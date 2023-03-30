@@ -1,0 +1,43 @@
+from numba import cuda
+import numpy as np
+
+# Measure exec time
+from timeit import default_timer as timer
+
+# On CPU
+def func(a):
+    for i in range(100):
+        a[i] += 1
+
+# On GPU
+@cuda.jit
+def func2(a):
+    i = cuda.grid(1)
+    if i < a.size:
+        a[i] += 1
+
+if __name__ == "__main__":
+    n = 100
+    a = np.ones(n, dtype=np.float64)
+
+    start = timer()
+    func(a)
+    print("CPU:", timer() - start)
+
+    a = np.ones(n, dtype=np.float64)  # Reset the array for GPU
+
+    # Copy data to GPU memory
+    a_gpu = cuda.to_device(a)
+
+    # Define block and grid dimensions
+    threads_per_block = 32
+    blocks_per_grid = (n + threads_per_block - 1) // threads_per_block
+
+    start = timer()
+    func2[blocks_per_grid, threads_per_block](a_gpu)
+    cuda.synchronize()  # Synchronize GPU
+    print("GPU:", timer() - start)
+
+    # Copy data back to CPU memory
+    a_result = a_gpu.copy_to_host()
+    print("GPU result:", a_result)

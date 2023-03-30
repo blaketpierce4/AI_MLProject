@@ -1,0 +1,30 @@
+import numba as nb
+import numpy as np
+import time
+
+@nb.jit(nopython=True)
+def estimate_pi_cpu(num_samples):
+    # Generate random points on the CPU
+    x = np.random.uniform(-1, 1, num_samples)
+    y = np.random.uniform(-1, 1, num_samples)
+
+    # Count the number of points inside the circle on the CPU
+    num_inside = 0
+    for i in range(num_samples):
+        if x[i]**2 + y[i]**2 <= 1:
+            num_inside += 1
+
+    # Compute the estimated value of pi on the CPU
+    pi_estimate = 4 * num_inside / num_samples
+
+    return pi_estimate
+
+# Example usage
+num_samples = 10000000000
+
+start_time = time.time()
+pi_estimate = estimate_pi_cpu(num_samples)
+end_time = time.time()
+
+print(f"Estimated value of pi using {num_samples} samples: {pi_estimate:.6f}")
+print(f"Execution time: {end_time - start_time:.4f} seconds")
