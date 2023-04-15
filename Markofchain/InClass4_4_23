@@ -1,0 +1,61 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Generate some sample data
+np.random.seed(123)
+n = 100
+data = np.random.normal(loc=170, scale=5, size=n)
+
+# Define the likelihood function
+def likelihood(mean, sd, data):
+    return np.sum(np.log(np.exp(-(data - mean)**2 / (2 * sd**2)) / (sd * np.sqrt(2 * np.pi))))
+
+# Define the prior distribution for the mean and standard deviation
+def prior_mean(x):
+    return np.log(np.exp(-(x - 170)**2 / (2 * 10**2)) / (10 * np.sqrt(2 * np.pi)))
+
+def prior_sd(x):
+    return np.log(1 / 100) if 0 <= x <= 100 else -np.inf
+
+# Define the posterior distribution
+def posterior(mean, sd, data):
+    return likelihood(mean, sd, data) + prior_mean(mean) + prior_sd(sd)
+
+# Define the proposal distribution (normal distribution with mean 0 and standard deviation 1)
+def proposal_mean(x):
+    return np.random.normal(loc=x, scale=1, size=1)
+
+def proposal_sd(x):
+    return np.exp(np.random.normal(loc=np.log(x), scale=1, size=1))
+
+# Define the number of iterations
+n_iterations = 10000
+
+# Initialize the current state and the samples vector
+current_state = np.array([160, 10])
+samples = np.zeros((n_iterations, 2))
+
+# Loop over the iterations
+for i in range(n_iterations):
+    # Generate a proposal state from the proposal distribution
+    proposal_state = np.array([proposal_mean(current_state[0])[0], proposal_sd(current_state[1])[0]])
+
+    # Calculate the acceptance probability
+    acceptance_prob = np.exp(posterior(proposal_state[0], proposal_state[1], data) - posterior(current_state[0], current_state[1], data))
+    
+    # Accept or reject the proposal state
+    if np.random.uniform() < acceptance_prob:
+        current_state = proposal_state
+    
+    # Add the current state to the samples matrix
+    samples[i, :] = current_state
+
+# Plot the samples histogram and the true distribution
+true_mean = np.mean(data)
+true_sd = np.std(data)
+x = np.linspace(true_mean - 5*true_sd, true_mean + 5*true_sd, num=100)
+plt.hist(samples[:, 0], bins=50, density=True, color="gray", label="Samples")
+plt.plot(x, np.exp(-(x - true_mean)**2 / (2 * true_sd**2)) / (true_sd * np.sqrt(2 * np.pi)), color="red", linewidth=2, label="True distribution")
+plt.xlabel("Mean height (cm)")
+plt.legend()
+plt.show()

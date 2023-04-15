@@ -1,0 +1,102 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the target distribution
+def target_distribution(x):
+    return np.exp(-x**2 / 2) * np.sin(4 * x)
+
+# Define the proposal distribution (normal distribution with mean 0 and standard deviation 1)
+def proposal_distribution(x):
+    return np.random.normal(loc=x, scale=1, size=1)
+
+# Define the number of iterations
+n_iterations = 10000
+
+# Initialize the current state and the samples vector
+current_state = np.random.normal(size=1)
+samples = np.zeros(n_iterations)
+
+# Loop over the iterations
+for i in range(n_iterations):
+    # Generate a proposal state from the proposal distribution
+    proposal_state = proposal_distribution(current_state)
+    
+    # Calculate the acceptance probability
+    acceptance_prob = min(1, target_distribution(proposal_state) / target_distribution(current_state))
+    
+    # Accept or reject the proposal state
+    if np.random.uniform() < acceptance_prob:
+        current_state = proposal_state
+    
+    # Add the current state to the samples vector
+    samples[i] = current_state
+
+# Plot the samples histogram and the target distribution
+x = np.linspace(-3, 3, num=1000)
+plt.hist(samples, bins=50, density=True, color="gray", label="Samples")
+plt.plot(x, target_distribution(x), color="red", linewidth=2, label="Target distribution")
+plt.xlabel("x")
+plt.legend()
+plt.show()
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import gamma, norm
+
+# Generate some sample data from a gamma distribution
+np.random.seed(42)
+n = 1000
+shape, scale = 2, 3
+data = np.random.gamma(shape, scale, size=n)
+
+# Define the likelihood function
+def likelihood(mean, sd, data):
+    k = mean ** 2 / sd ** 2
+    theta = sd ** 2 / mean
+    return np.sum(gamma.logpdf(data, a=k, scale=theta))
+
+# Define the prior distributions for the mean and standard deviation
+def prior_mean(x):
+    return norm.logpdf(x, loc=2, scale=10)
+
+def prior_sd(x):
+    return norm.logpdf(x, loc=3, scale=10)
+
+# Define the posterior distribution
+def posterior(mean, sd, data):
+    return likelihood(mean, sd, data) + prior_mean(mean) + prior_sd(sd)
+
+# Define the proposal distributions
+def proposal_mean(x):
+    return np.random.normal(loc=x, scale=0.5, size=1)
+
+def proposal_sd(x):
+    return np.random.normal(loc=x, scale=0.5, size=1)
+
+# Define the number of iterations
+n_iterations = 20000
+
+# Initialize the current state and the samples vector
+current_state = np.array([2, 3])
+samples = np.zeros((n_iterations, 2))
+
+# Loop over the iterations
+for i in range(n_iterations):
+    # Generate a proposal state from the proposal distributions
+    proposal_state = np.array([proposal_mean(current_state[0])[0], proposal_sd(current_state[1])[0]])
+    
+    # Calculate the acceptance probability
+    acceptance_prob = np.exp(posterior(proposal_state[0], proposal_state[1], data) - posterior(current_state[0], current_state[1], data))
+    
+    # Accept or reject the proposal state
+    if np.random.uniform() < acceptance_prob:
+        current_state = proposal_state
+    
+    # Add the current state to the samples vector
+    samples[i, :] = current_state
+
+# Plot the samples histogram
+plt.hist2d(samples[:, 0], samples[:, 1], bins=50, cmap="Greys")
+plt.xlabel("Mean")
+plt.ylabel("Standard Deviation")
+plt.title("Metropolis-Hastings Sampling")
+plt.show()

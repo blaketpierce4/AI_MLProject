@@ -1,0 +1,43 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+# Define the target distribution
+def target_distribution(x):
+   return np.exp(-x ** 2 / 2) * np.sin(4 * x)
+
+
+# Define the proposal distribution (normal distribution with mean 0 and standard deviation 1)
+def proposal_distribution(x):
+   return np.random.normal(x, 1)
+
+
+# Define the number of iterations
+n_iterations = 10000
+
+# Initialize the current state and the samples list
+current_state = np.random.randn()
+samples = []
+
+# Loop over the iterations
+for i in range(n_iterations):
+   # Generate a proposal state from the proposal distribution
+   proposal_state = proposal_distribution(current_state)
+
+   # Calculate the acceptance probability
+   acceptance_prob = min(1, target_distribution(proposal_state) / target_distribution(current_state))
+
+   # Accept or reject the proposal state
+   if np.random.rand() < acceptance_prob:
+      current_state = proposal_state
+
+   # Add the current state to the samples list
+   samples.append(current_state)
+
+# Plot the samples histogram and the target distribution
+x = np.linspace(-3, 3, 1000)
+plt.hist(samples, bins=50, density=True, alpha=0.5)
+plt.plot(x, target_distribution(x), linewidth=2)
+plt.xlabel('x')
+plt.ylabel('density')
+plt.show()
